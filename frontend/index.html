@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Benefícios</title>
+</head>
+<body>
+  <h2>Consulta de Benefícios</h2>
+  <label for="cpfInput">Digite o CPF:</label>
+  <input type="text" id="cpfInput" placeholder="Insira o CPF">
+  <button onclick="processCPF()">Processar CPF</button>
+
+  <div id="results"></div>
+
+  <script>
+    async function processCPF() {
+    const cpfInput = document.getElementById('cpfInput');
+    const cpf = cpfInput.value;
+
+        try {
+            const response = await fetch('http://localhost:3000/api/v1/process-cpf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cpf }),
+            });
+
+            const data = await response.json();
+
+            renderize(data);
+        } catch (error) {
+            console.error('Erro ao processar CPF:', error);
+            alert('Erro ao processar CPF. Verifique o console para mais detalhes.');
+        }
+    }
+
+    function renderize(data) {
+        const results = document.getElementById('results');
+        results.innerHTML = '';
+
+        if (data && data.cpf && data.beneficios && data.beneficios.length > 0) {
+            const ul = document.createElement('ul');
+
+            data.beneficios.forEach(beneficio => {
+            const li = document.createElement('li');
+            li.textContent = `Número do Benefício: ${beneficio.numero_beneficio}, Código do Tipo de Benefício: ${beneficio.codigo_tipo_beneficio}`;
+            ul.appendChild(li);
+            });
+
+            results.appendChild(ul);
+        } else {
+            results.textContent = 'Nenhum benefício encontrado para o CPF fornecido.';
+        }
+    }
+
+  </script>
+</body>
+</html>
+
